@@ -8,7 +8,6 @@
 
 #include "interrupts.hpp"
 
-unsigned int next_pid = 1;
 static unsigned int g_next_pid = 1;
 
 
@@ -33,7 +32,7 @@ std::tuple<std::string, std::string, int> simulate_trace(std::vector<std::string
             execution += intr;
             current_time = time;
 
-            execution += std::to_string(current_time) + ", " + std::to_string(delays[duration_intr]) + ", SYSCALL ISR (ADD STEPS HERE)\n";
+            execution += std::to_string(current_time) + ", " + std::to_string(delays[duration_intr]) + ", SYSCALL ISR (Transferring data from device to memory, Checking for errors)\n";
             current_time += delays[duration_intr];
 
             execution +=  std::to_string(current_time) + ", 1, IRET\n";
@@ -43,7 +42,7 @@ std::tuple<std::string, std::string, int> simulate_trace(std::vector<std::string
             current_time = time;
             execution += intr;
 
-            execution += std::to_string(current_time) + ", " + std::to_string(delays[duration_intr]) + ", ENDIO ISR(ADD STEPS HERE)\n";
+            execution += std::to_string(current_time) + ", " + std::to_string(delays[duration_intr]) + ", ENDIO ISR(Check device status)\n";
             current_time += delays[duration_intr];
 
             execution +=  std::to_string(current_time) + ", 1, IRET\n";
@@ -58,7 +57,8 @@ std::tuple<std::string, std::string, int> simulate_trace(std::vector<std::string
 
             // Logging the ISR for FORK
             execution += std::to_string(current_time) + ", " + std::to_string(duration_intr) + ", Cloning the PCB\n";
-            
+            current_time += duration_intr;
+
             // Create the child's PCB
             PCB child(g_next_pid++, current.PID, current.program_name, current.size, -1);
 
@@ -72,6 +72,7 @@ std::tuple<std::string, std::string, int> simulate_trace(std::vector<std::string
             current_time += 1;
 
             system_status += "time: " + std::to_string(current_time) + "; current trace: FORK, " + std::to_string(duration_intr) + "\n";
+            system_status += print_PCB(current, wait_queue);
             system_status += "\n";
 
             ///////////////////////////////////////////////////////////////////////////////////////////
@@ -144,6 +145,10 @@ std::tuple<std::string, std::string, int> simulate_trace(std::vector<std::string
 
             current_time += load_time;
 
+            free_memory(&current);
+            current.program_name = program_name;
+            current.size = prg_size;
+
             if (!allocate_memory(&current)){
                 throw std::runtime_error("No fixed partition fits " + program_name);
             }
@@ -151,16 +156,15 @@ std::tuple<std::string, std::string, int> simulate_trace(std::vector<std::string
             current_time += 3;
 
             execution += std::to_string(current_time) + ", 6, updating PCB\n";
-            current.program_name = program_name;
-            current.size = prg_size;
             current_time += 6;
 
             execution += std::to_string(current_time) + ", 0, scheduler called\n";
             execution += std::to_string(current_time) + ", 1, IRET\n";
             current_time += 1;
 
-            system_status += "time: " + std::to_string(current_time) + "; current trace: " + trace_file[i] + "\n";
+            system_status += "time: " + std::to_string(current_time) + "; current trace: EXEC " + program_name + ", " + std::to_string(duration_intr) + "\n";
             system_status += print_PCB(current, wait_queue);
+            system_status += "\n";
 
 
             ///////////////////////////////////////////////////////////////////////////////////////////
