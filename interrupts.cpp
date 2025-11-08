@@ -8,6 +8,10 @@
 
 #include<interrupts.hpp>
 
+unsigned int next_pid = 1;
+static unsigned int g_next_pid = 1;
+
+
 std::tuple<std::string, std::string, int> simulate_trace(std::vector<std::string> trace_file, int time, std::vector<std::string> vectors, std::vector<int> delays, std::vector<external_file> external_files, PCB current, std::vector<PCB> wait_queue) {
 
     std::string trace;      //!< string to store single line of trace file
@@ -60,6 +64,17 @@ std::tuple<std::string, std::string, int> simulate_trace(std::vector<std::string
 
             allocate_memory(&child);
 
+            wait_queue.push_back(current);
+            current = child;
+
+            execution += std::to_string(current_time) + ", 0, scheduler called\n";
+            execution += std::to_string(current_time) + ", 1, IRET\n";
+            current_time += 1;
+
+            system_status += "time: " + std::to_string(current_time) + "; current trace: FORK, " + std::to_string(duration_intr) + "\n";
+            system_status += "\n";
+
+
 
 
 
@@ -101,8 +116,7 @@ std::tuple<std::string, std::string, int> simulate_trace(std::vector<std::string
 
             ///////////////////////////////////////////////////////////////////////////////////////////
             //With the child's trace, run the child (HINT: think recursion)
-
-
+            
 
             ///////////////////////////////////////////////////////////////////////////////////////////
 
