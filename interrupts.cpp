@@ -74,10 +74,6 @@ std::tuple<std::string, std::string, int> simulate_trace(std::vector<std::string
             system_status += "time: " + std::to_string(current_time) + "; current trace: FORK, " + std::to_string(duration_intr) + "\n";
             system_status += "\n";
 
-
-
-
-
             ///////////////////////////////////////////////////////////////////////////////////////////
 
             //The following loop helps you do 2 things:
@@ -116,7 +112,16 @@ std::tuple<std::string, std::string, int> simulate_trace(std::vector<std::string
 
             ///////////////////////////////////////////////////////////////////////////////////////////
             //With the child's trace, run the child (HINT: think recursion)
-            
+            auto [child_exec_log, child_sys_log, child_end_time] = simulate_trace(child_trace, current_time, vectors, delays, external_files, current, wait_queue);
+
+            execution += child_exec_log;
+            system_status += child_sys_log;
+            current_time = child_end_time;
+
+            free_memory(&current);
+
+            current = wait_queue.back();
+            wait_queue.pop_back();
 
             ///////////////////////////////////////////////////////////////////////////////////////////
 
@@ -156,8 +161,6 @@ std::tuple<std::string, std::string, int> simulate_trace(std::vector<std::string
 
             system_status += "time: " + std::to_string(current_time) + "; current trace: " + trace_file[i] + "\n";
             system_status += print_PCB(current, wait_queue);
-
-
 
 
             ///////////////////////////////////////////////////////////////////////////////////////////
