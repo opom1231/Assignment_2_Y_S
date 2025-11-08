@@ -129,25 +129,25 @@ std::tuple<std::string, std::string, int> simulate_trace(std::vector<std::string
             ///////////////////////////////////////////////////////////////////////////////////////////
             //Add your EXEC output here
 
-            unsigned int program_size = get_size(program_name, external_files);
+            unsigned int prg_size = get_size(program_name, external_files);
 
-            execution += std::to_string(current_time) + ", " + std::to_string(duration_intr) +", Program is " + std::to_string(program_size) + " Mb large\n";
+            execution += std::to_string(current_time) + ", " + std::to_string(duration_intr) +", Program is " + std::to_string(prg_size) + " Mb large\n";
             current_time += duration_intr;
 
-            int load_time = 15 * program_size;
+            int load_time = 15 * prg_size;
             execution += std::to_string(current_time) + ", " + std::to_string(load_time) +", loading program into memory\n";
 
             current_time += load_time;
 
-            if(!allocate_memory(&current)) {
-                std::cerr << "Memory allocation failed for: " << program_name << std::endl;
+            if (!allocate_memory(&current)){
+                throw std::runtime_error("No fixed partition fits " + program_name);
             }
             execution += std::to_string(current_time) + ", 3, marking partition as occupied\n";
             current_time += 3;
 
             execution += std::to_string(current_time) + ", 6, updating PCB\n";
             current.program_name = program_name;
-            current.size = program_size;
+            current.size = prg_size;
             current_time += 6;
 
             execution += std::to_string(current_time) + ", 0, scheduler called\n";
