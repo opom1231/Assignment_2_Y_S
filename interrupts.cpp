@@ -2,7 +2,7 @@
  *
  * @file interrupts.cpp
  * @author Sasisekhar Govind
- * @author Steven Arvanitis
+ * @author Steven Arvanitis, Yoseph Amare
  *
  */
 
