@@ -174,6 +174,12 @@ std::tuple<std::string, std::string, int> simulate_trace(std::vector<std::string
             ///////////////////////////////////////////////////////////////////////////////////////////
             //With the exec's trace (i.e. trace of external program), run the exec (HINT: think recursion)
 
+            auto [p_exec, p_status, p_end] = simulate_trace(exec_traces, current_time, vectors, delays, external_files, current, wait_queue);
+
+            execution += p_exec;
+            system_status += p_status;
+            current_time = p_end;
+
 
 
             ///////////////////////////////////////////////////////////////////////////////////////////
