@@ -2,6 +2,7 @@
  *
  * @file interrupts.cpp
  * @author Sasisekhar Govind
+ * @author Steven Arvanitis
  *
  */
 
@@ -50,6 +51,15 @@ std::tuple<std::string, std::string, int> simulate_trace(std::vector<std::string
 
             ///////////////////////////////////////////////////////////////////////////////////////////
             //Add your FORK output here
+
+            // Logging the ISR for FORK
+            execution += std::to_string(current_time) + ", " + std::to_string(duration_intr) + ", Cloning the PCB\n";
+            
+            // Create the child's PCB
+            PCB child(g_next_pid++, current.PID, current.program_name, current.size, -1);
+
+            allocate_memory(&child);
+
 
 
 
